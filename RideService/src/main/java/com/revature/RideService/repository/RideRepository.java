@@ -9,5 +9,5 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface RideRepository extends JpaRep
+public interface RideRepository {
 }
