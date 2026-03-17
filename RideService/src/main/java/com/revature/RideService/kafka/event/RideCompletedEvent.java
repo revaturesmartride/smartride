@@ -17,21 +17,21 @@ import java.time.LocalDateTime;
 @Builder
 public class RideCompletedEvent {
 
-    // ── Identifiers ───────────────────────────────────────────────────────────
+
     private Long rideId;
     private Long riderId;
     private Long driverId;
 
-    // ── Trip details ──────────────────────────────────────────────────────────
+
     private String pickupLocation;
     private String dropLocation;
 
-    // ── Fare details ──────────────────────────────────────────────────────────
+
     // Both come from Ride entity fields (Double distance, Double fare)
     private Double distance;        // Ride.distance
     private Double fare;            // Ride.fare — calculated by FareCalculator
 
-    // ── Meta ──────────────────────────────────────────────────────────────────
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 }

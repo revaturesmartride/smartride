@@ -16,16 +16,16 @@ import java.time.LocalDateTime;
 @Builder
 public class RideAssignedEvent {
 
-    // ── Identifiers ───────────────────────────────────────────────────────────
+
     private Long rideId;            // Ride.id (PK of rides table — newly created)
     private Long rideRequestId;     // RideRequest.id this ride was created from
     private Long riderId;           // rider who originally requested
     private Long driverId;          // driver who accepted
 
-    // ── Trip details ──────────────────────────────────────────────────────────
+
     private String pickupLocation;
     private String dropLocation;
 
-    // ── Meta ──────────────────────────────────────────────────────────────────
+
     private LocalDateTime assignedAt;
 }

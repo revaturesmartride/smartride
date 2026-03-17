@@ -15,15 +15,15 @@ import java.time.LocalDateTime;
 @Builder
 public class RideStartedEvent {
 
-    // ── Identifiers ───────────────────────────────────────────────────────────
+
     private Long rideId;
     private Long riderId;
     private Long driverId;
 
-    // ── Trip details ──────────────────────────────────────────────────────────
+
     private String pickupLocation;
     private String dropLocation;
 
-    // ── Meta ──────────────────────────────────────────────────────────────────
+
     private LocalDateTime startTime;
 }

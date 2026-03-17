@@ -20,13 +20,13 @@ public class PaymentFailedException extends RuntimeException {
 
     private final Long rideId;
 
-    // ── Constructor with message only ─────────────────────────────────────────
+
     public PaymentFailedException(String message) {
         super(message);
         this.rideId = null;
     }
 
-    // ── Constructor with message + rideId (useful for GlobalExceptionHandler) ─
+
     public PaymentFailedException(String message, Long rideId) {
         super(message);
         this.rideId = rideId;

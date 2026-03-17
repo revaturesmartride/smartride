@@ -16,17 +16,17 @@ import java.time.LocalDateTime;
 @Builder
 public class PaymentCompletedEvent {
 
-    // ── Identifiers ───────────────────────────────────────────────────────────
+
     private Long paymentId;         // Payment.id (PK of payments table)
     private Long rideId;            // the ride this payment belongs to
     private Long riderId;           // who paid
     private Long driverId;          // who receives earnings
 
-    // ── Payment details ───────────────────────────────────────────────────────
+
     private Double amount;          // Payment.amount
     private String paymentMethod;   // Payment.paymentMethod  e.g. "UPI", "CARD", "CASH"
     private String transactionId;   // Payment.transactionId — unique UUID per transaction
 
-    // ── Meta ──────────────────────────────────────────────────────────────────
+
     private LocalDateTime paidAt;   // Payment.createdAt
 }

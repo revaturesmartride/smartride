@@ -16,15 +16,15 @@ import java.time.LocalDateTime;
 @Builder
 public class RideCreatedEvent {
 
-    // ── Identifiers ───────────────────────────────────────────────────────────
+
     private Long rideRequestId;     // RideRequest.id (PK of ride_requests table)
     private Long riderId;           // who requested the ride
 
-    // ── Trip details ──────────────────────────────────────────────────────────
+
     private String pickupLocation;
     private String dropLocation;
 
-    // ── Meta ──────────────────────────────────────────────────────────────────
+
     private String status;          // always "PENDING" at this stage
     private LocalDateTime requestedTime;
 }

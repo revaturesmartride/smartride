@@ -35,13 +35,7 @@ public class RideServiceImpl implements RideService {
     private final RideEventProducer rideEventProducer;
     private final FareCalculator fareCalculator;
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 1. REQUEST RIDE
-    //    - Validates incoming DTO
-    //    - Persists a RideRequest (status = "PENDING")
-    //    - Publishes RideCreatedEvent to Kafka
-    //    - Returns RideResponseDTO built from the saved RideRequest
-    // ─────────────────────────────────────────────────────────────────────────
+
     @Override
     @Transactional
     public RideResponseDTO requestRide(RideRequestDTO dto) {
@@ -60,8 +54,7 @@ public class RideServiceImpl implements RideService {
             throw new IllegalArgumentException("Drop location must not be blank");
         }
 
-        // --- Persist RideRequest ---
-        // RideRequest.status is a plain String field (see entity)
+
         RideRequest rideRequest = RideRequest.builder()
                 .riderId(dto.getRiderId())
                 .pickupLocation(dto.getPickupLocation())
@@ -96,13 +89,6 @@ public class RideServiceImpl implements RideService {
                 .build();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 2. ACCEPT RIDE
-    //    - Driver picks a PENDING RideRequest
-    //    - RideRequest.status → "ACCEPTED"
-    //    - Creates the Ride row, linking back to RideRequest via @OneToOne
-    //    - Publishes RideAssignedEvent
-    // ─────────────────────────────────────────────────────────────────────────
     @Override
     @Transactional
     public RideResponseDTO acceptRide(Long rideRequestId, Long driverId) {
@@ -155,12 +141,7 @@ public class RideServiceImpl implements RideService {
         return toResponseDTO(savedRide);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 3. START RIDE
-    //    - Ride must be in ACCEPTED state
-    //    - Sets status → IN_PROGRESS, stamps startTime
-    //    - Publishes RideStartedEvent
-    // ─────────────────────────────────────────────────────────────────────────
+
     @Override
     @Transactional
     public RideResponseDTO startRide(Long rideId) {
@@ -186,13 +167,7 @@ public class RideServiceImpl implements RideService {
         return toResponseDTO(savedRide);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 4. COMPLETE RIDE
-    //    - Ride must be IN_PROGRESS
-    //    - FareCalculator computes fare from pickup/drop strings
-    //    - Sets status → COMPLETED, stamps endTime, persists fare
-    //    - Publishes RideCompletedEvent
-    // ─────────────────────────────────────────────────────────────────────────
+
     @Override
     @Transactional
     public RideResponseDTO completeRide(Long rideId) {
@@ -225,9 +200,7 @@ public class RideServiceImpl implements RideService {
         return toResponseDTO(savedRide);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 5. GET RIDE BY ID
-    // ─────────────────────────────────────────────────────────────────────────
+
     @Override
     @Transactional(readOnly = true)
     public RideResponseDTO getRide(Long rideId) {
@@ -235,9 +208,7 @@ public class RideServiceImpl implements RideService {
         return toResponseDTO(findRideOrThrow(rideId));
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 6. GET ALL RIDES BY RIDER
-    // ─────────────────────────────────────────────────────────────────────────
+
     @Override
     @Transactional(readOnly = true)
     public List<RideResponseDTO> getRidesByRider(Long riderId) {
@@ -248,9 +219,7 @@ public class RideServiceImpl implements RideService {
                 .collect(Collectors.toList());
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 7. GET ALL RIDES BY DRIVER
-    // ─────────────────────────────────────────────────────────────────────────
+
     @Override
     @Transactional(readOnly = true)
     public List<RideResponseDTO> getRidesByDriver(Long driverId) {
@@ -261,9 +230,6 @@ public class RideServiceImpl implements RideService {
                 .collect(Collectors.toList());
     }
 
-    // =========================================================================
-    // PRIVATE HELPERS
-    // =========================================================================
 
     /**
      * Loads a Ride by id or throws RideNotFoundException.
@@ -286,23 +252,17 @@ public class RideServiceImpl implements RideService {
         }
     }
 
-    /**
-     * Manual mapper: Ride entity → RideResponseDTO.
-     *
-     * NOTE: RideResponseDTO.rideId maps from Ride.id  (entity PK is 'id',
-     * DTO field is 'rideId' — see your RideResponseDTO.java).
-     * RideRequest id is read via ride.getRideRequest().getId().
-     */
+
     private RideResponseDTO toResponseDTO(Ride ride) {
         return RideResponseDTO.builder()
-                .rideId(ride.getId())                           // DTO: rideId  ← entity: id
+                .rideId(ride.getId())
                 .riderId(ride.getRiderId())
                 .driverId(ride.getDriverId())
                 .pickupLocation(ride.getPickupLocation())
                 .dropLocation(ride.getDropLocation())
                 .distance(ride.getDistance())
                 .fare(ride.getFare())
-                .status(ride.getStatus() != null              // RideStatus enum → String
+                .status(ride.getStatus() != null
                         ? ride.getStatus().name() : null)
                 .requestedTime(ride.getRequestedTime())
                 .startTime(ride.getStartTime())

@@ -1,4 +1,8 @@
 package com.revature.RideService.config;
 
-public class FeignConfig {
+import org.springframework.cloud.openfeign.FeignClient;
+
+@FeignClient
+public interface FeignConfig {
+
 }

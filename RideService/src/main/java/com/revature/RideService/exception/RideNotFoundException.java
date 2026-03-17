@@ -17,13 +17,13 @@ public class RideNotFoundException extends RuntimeException {
 
     private final Long resourceId;
 
-    // ── Constructor with message only ─────────────────────────────────────────
+
     public RideNotFoundException(String message) {
         super(message);
         this.resourceId = null;
     }
 
-    // ── Constructor with message + id (useful for GlobalExceptionHandler) ─────
+
     public RideNotFoundException(String message, Long resourceId) {
         super(message);
         this.resourceId = resourceId;
