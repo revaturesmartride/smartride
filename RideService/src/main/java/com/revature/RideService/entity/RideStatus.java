@@ -1,7 +1,7 @@
 package com.revature.RideService.entity;
 
 public enum RideStatus {
-    REQUESTED,
+     ACCEPTED,
     DRIVER_ASSIGNED,
     STARTED,
     COMPLETED,
