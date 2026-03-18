@@ -60,8 +60,16 @@ public class AuthServiceImpl implements AuthService {
                 UserRole.DRIVER
         );
 
-        // We are using  DriverMapper
-        DriverProfile driverProfile = DriverMapper.toEntity(request, user);
+        // We are using  DriverProfile using builder
+        DriverProfile driverProfile = DriverProfile.builder()
+                .user(user)
+                .licenceNumber(request.getLicenceNumber())
+                .vehicleId(request.getVehicleId())
+                .rating(0.0)
+                .totalRides(0)
+                .availabilityStatus(DriverAvailabilityStatus.OFFLINE)
+                .approvalStatus(DriverApprovalStatus.PENDING)
+                .build();
 
         driverProfileRepository.save(driverProfile);
 
