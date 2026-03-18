@@ -20,6 +20,7 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(String userEmail, String role) {
+        Object SignatureAlgorithm;
         return Jwts.builder()
                 .setSubject(userEmail)
                 .claim("role", role)

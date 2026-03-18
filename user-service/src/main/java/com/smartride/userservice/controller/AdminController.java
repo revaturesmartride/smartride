@@ -2,7 +2,6 @@ package com.smartride.userservice.controller;
 
 import com.smartride.userservice.dto.response.UserResponse;
 import com.smartride.userservice.model.DriverApprovalStatus;
-import com.smartride.userservice.model.UserEntity;
 import com.smartride.userservice.model.UserStatus;
 import com.smartride.userservice.repository.DriverProfileRepository;
 import com.smartride.userservice.repository.UserRepository;
