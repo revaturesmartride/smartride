@@ -4,13 +4,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+
 @Data
 public class RiderRegisterRequest {
     @NotBlank
     private String userName;
-    @Email
+    @Email(message = "Invalid email format")
     private String userEmail;
     @NotBlank
     private String userPassword;
+    @NotBlank
     private String userPhone;
 }
