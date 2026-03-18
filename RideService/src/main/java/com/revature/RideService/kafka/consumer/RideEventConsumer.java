@@ -22,7 +22,7 @@ public class RideEventConsumer {
                 .rideId(event.getRideId())
                 .riderId(event.getRiderId())
                 .driverId(event.getDriverId())
-                .amount(event.getAmount())
+                .amount(event.getFare())
                 .paymentMethod("UPI") // default or logic
                 .build();
 

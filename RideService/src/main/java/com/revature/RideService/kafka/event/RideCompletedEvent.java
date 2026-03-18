@@ -34,4 +34,6 @@ public class RideCompletedEvent {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+
+
 }
