@@ -27,7 +27,7 @@ public class DriverProfile {
 
     private String licenceNumber;
 
-    private Long vehicleId;
+    private  String vehicleId;
 
     private Double rating;
 

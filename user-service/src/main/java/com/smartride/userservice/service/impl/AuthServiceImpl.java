@@ -6,13 +6,12 @@ import com.smartride.userservice.dto.response.AuthResponse;
 import com.smartride.userservice.exception.ResourceAlreadyExistsException;
 import com.smartride.userservice.exception.ResourceNotFoundException;
 import com.smartride.userservice.exception.UnauthorizedException;
+import com.smartride.userservice.mapper.DriverMapper;
 import com.smartride.userservice.model.*;
 import com.smartride.userservice.repository.DriverProfileRepository;
 import com.smartride.userservice.repository.UserRepository;
 import com.smartride.userservice.security.JwtTokenProvider;
 import com.smartride.userservice.service.AuthService;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -61,16 +60,8 @@ public class AuthServiceImpl implements AuthService {
                 UserRole.DRIVER
         );
 
-        // We are using  DriverProfile using builder
-        DriverProfile driverProfile = DriverProfile.builder()
-                .user(user)
-                .licenceNumber(request.getLicenceNumber())
-                .vehicleId(request.getVehicleId())
-                .rating(0.0)
-                .totalRides(0)
-                .availabilityStatus(DriverAvailabilityStatus.OFFLINE)
-                .approvalStatus(DriverApprovalStatus.PENDING)
-                .build();
+        // We are using  DriverMapper
+        DriverProfile driverProfile = DriverMapper.toEntity(request, user);
 
         driverProfileRepository.save(driverProfile);
 

@@ -16,5 +16,5 @@ public class DriverRegisterRequest {
     @NotBlank
     private String userPhone;
     private String licenceNumber;
-    private Long vehicleId;
+    private String vehicleId;
 }
