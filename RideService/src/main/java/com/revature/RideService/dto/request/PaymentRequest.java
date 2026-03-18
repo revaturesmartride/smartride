@@ -1,4 +1,4 @@
 package com.revature.RideService.dto.request;
 
-public class RatingRequest {
+public class PaymentRequest {
 }

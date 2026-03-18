@@ -1,5 +1,6 @@
 package com.smartride.userservice.dto.response;
 
+import com.smartride.userservice.model.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,6 +8,6 @@ import lombok.Data;
 @Builder
 public class AuthResponse {
     private String token;
-    private String role;
+    private UserRole role;
     private Long userId;
 }

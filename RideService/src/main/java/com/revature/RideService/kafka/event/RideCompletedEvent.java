@@ -1,20 +1,5 @@
 package com.revature.RideService.kafka.event;
 
-import lombok.*;
-
-import java.time.LocalDateTime;
-
-/**
- * Published when a ride is marked COMPLETED.
- * This is the trigger for PaymentService to initiate fare collection
- * and for NotificationService to prompt the rider to rate the trip.
- * Consumers: PaymentService, NotificationService
- */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class RideCompletedEvent {
 
 

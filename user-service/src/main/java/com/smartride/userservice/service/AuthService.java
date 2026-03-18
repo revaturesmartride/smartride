@@ -5,7 +5,7 @@ import com.smartride.userservice.dto.request.LoginRequest;
 import com.smartride.userservice.dto.request.RiderRegisterRequest;
 import com.smartride.userservice.dto.response.AuthResponse;
 
-interface authService {
+public interface AuthService {
     AuthResponse registerRider(RiderRegisterRequest request);
 
     AuthResponse registerDriver(DriverRegisterRequest request);

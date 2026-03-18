@@ -1,22 +1,5 @@
 package com.revature.RideService.exception;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
-@RestControllerAdvice
-@Slf4j
 public class GlobalExceptionHandler {
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -170,4 +153,3 @@ public class GlobalExceptionHandler {
         private LocalDateTime timestamp;
     }
 }
-

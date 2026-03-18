@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.sql.Timestamp;
-
 @Data
 @Builder
 public class UserResponse {
@@ -17,5 +16,4 @@ public class UserResponse {
     private UserRole userRole;
     private UserStatus status;
     private Timestamp createdAt;
-
 }
