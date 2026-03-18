@@ -23,4 +23,5 @@ public interface RideService {
     List<RideResponseDTO> getRidesByRider(Long riderId);
 
     List<RideResponseDTO> getRidesByDriver(Long driverId);
+    RideResponseDTO cancelRide(Long rideId);
 }

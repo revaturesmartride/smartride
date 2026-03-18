@@ -1,8 +1,10 @@
 package com.revature.RideService.service.impl;
 
 
+import com.revature.RideService.client.UserServiceClient;
 import com.revature.RideService.dto.request.RideRequestDTO;
 import com.revature.RideService.dto.response.RideResponseDTO;
+import com.revature.RideService.dto.response.UserResponse;
 import com.revature.RideService.entity.Ride;
 import com.revature.RideService.entity.RideRequest;
 import com.revature.RideService.entity.RideStatus;
@@ -34,6 +36,7 @@ public class RideServiceImpl implements RideService {
     private final RideRequestRepository rideRequestRepository;
     private final RideEventProducer rideEventProducer;
     private final FareCalculator fareCalculator;
+    private final UserServiceClient userServiceClient;
 
 
     @Override
@@ -41,6 +44,19 @@ public class RideServiceImpl implements RideService {
     public RideResponseDTO requestRide(RideRequestDTO dto) {
         log.info("Rider [{}] requesting ride from '{}' to '{}'",
                 dto.getRiderId(), dto.getPickupLocation(), dto.getDropLocation());
+
+        // Validate rider exists in UserService
+        UserResponse rider = userServiceClient.getUserById(dto.getRiderId());
+        if (rider == null) {
+            throw new RideNotFoundException(
+                    "Rider not found with id: " + dto.getRiderId());
+        }
+
+        // Validate role is RIDER
+        if (!"RIDER".equalsIgnoreCase(rider.getUserRole())) {
+            throw new IllegalStateException(
+                    "User [" + dto.getRiderId() + "] is not a RIDER");
+        }
 
         // --- Validation ---
         if (dto.getRiderId() == null) {
@@ -93,6 +109,17 @@ public class RideServiceImpl implements RideService {
     @Transactional
     public RideResponseDTO acceptRide(Long rideRequestId, Long driverId) {
         log.info("Driver [{}] accepting rideRequestId [{}]", driverId, rideRequestId);
+        // Validate driver exists in UserService
+        UserResponse driver = userServiceClient.getUserById(driverId);
+        if (driver == null) {
+            throw new RideNotFoundException(
+                    "Driver not found with id: " + driverId);
+        }
+
+        if (!"DRIVER".equalsIgnoreCase(driver.getUserRole())) {
+            throw new IllegalStateException(
+                    "User [" + driverId + "] is not a DRIVER");
+        }
 
         // --- Load RideRequest ---
         RideRequest rideRequest = rideRequestRepository.findById(rideRequestId)
@@ -252,7 +279,39 @@ public class RideServiceImpl implements RideService {
         }
     }
 
+    // ─────────────────────────────────────────────────────────────────────────────
+// CANCEL RIDE
+// Can be called by rider or driver before ride is COMPLETED.
+// Guards against cancelling an already COMPLETED or CANCELLED ride.
+// Publishes a RideCancelledEvent to Kafka.
+// ─────────────────────────────────────────────────────────────────────────────
+    @Override
+    @Transactional
+    public RideResponseDTO cancelRide(Long rideId) {
+        log.info("Cancelling rideId [{}]", rideId);
 
+        Ride ride = findRideOrThrow(rideId);
+
+        // Guard: cannot cancel a ride that is already finished
+        if (ride.getStatus() == RideStatus.COMPLETED ||
+                ride.getStatus() == RideStatus.CANCELLED) {
+            throw new IllegalStateException(
+                    "Cannot cancel ride [" + rideId + "] — current status: " + ride.getStatus());
+        }
+
+        ride.setStatus(RideStatus.CANCELLED);
+        Ride savedRide = rideRepository.save(ride);
+        log.info("Ride [{}] successfully CANCELLED", rideId);
+
+        // Also mark the linked RideRequest as CANCELLED
+        RideRequest rideRequest = savedRide.getRideRequest();
+        if (rideRequest != null) {
+            rideRequest.setStatus("CANCELLED");
+            rideRequestRepository.save(rideRequest);
+        }
+
+        return toResponseDTO(savedRide);
+    }
     private RideResponseDTO toResponseDTO(Ride ride) {
         return RideResponseDTO.builder()
                 .rideId(ride.getId())
