@@ -8,37 +8,27 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="drivers_db")
+@Table(name="users_db")
 @Builder
-public class DriverProfile {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long driverId;
-
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
-
-    private String licenceNumber;
-
-    private Long vehicleId;
-
-    private Double rating;
-
-    private int totalRides;
-
+    private Long userId;
+    @Column(nullable = false)
+    private String userName;
+    @Column(nullable = false, unique = true)
+    private String userEmail;
+    private String userPassword;
+    private String userPhone;
     @Enumerated(EnumType.STRING)
-    private DriverAvailabilityStatus availabilityStatus;
-
+    private UserRole userRole;
     @Enumerated(EnumType.STRING)
-    private DriverApprovalStatus approvalStatus;
-
+    private UserStatus status;
     @CreationTimestamp
     private Timestamp createdAt;
 
