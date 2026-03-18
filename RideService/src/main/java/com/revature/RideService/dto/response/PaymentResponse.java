@@ -2,6 +2,8 @@ package com.revature.RideService.dto.response;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,6 +15,10 @@ public class PaymentResponse {
 
     private Long rideId;
 
+    private Long riderId;
+
+    private Long driverId;
+
     private Double amount;
 
     private String paymentMethod;
@@ -20,4 +26,6 @@ public class PaymentResponse {
     private String paymentStatus;
 
     private String transactionId;
+
+    private LocalDateTime createdAt;
 }

@@ -32,6 +32,11 @@ public class PaymentFailedException extends RuntimeException {
         this.rideId = rideId;
     }
 
+    public PaymentFailedException(String message, Throwable cause){
+        super(message, cause);
+        this.rideId = null;
+    }
+
     public Long getRideId() {
         return rideId;
     }

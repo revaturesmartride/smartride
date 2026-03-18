@@ -1,7 +1,7 @@
 package com.revature.RideService.controller;
 
 import com.revature.RideService.dto.request.PaymentRequestDTO;
-import com.revature.RideService.entity.Payment;
+import com.revature.RideService.dto.response.PaymentResponse;
 import com.revature.RideService.service.PaymentService;
 
 import org.springframework.http.ResponseEntity;
@@ -18,21 +18,21 @@ public class PaymentController {
     }
 
     @PostMapping("/process")
-    public ResponseEntity<Payment> processPayment(@RequestBody PaymentRequestDTO request) {
+    public ResponseEntity<PaymentResponse> processPayment(@RequestBody PaymentRequestDTO request) {
 
-        Payment payment = paymentService.processPayment(request);
+        PaymentResponse payment = paymentService.processPayment(request);
 
         return ResponseEntity.ok(payment);
     }
 
     @GetMapping("/ride/{rideId}")
-    public ResponseEntity<Payment> getPaymentByRide(@PathVariable Long rideId) {
+    public ResponseEntity<PaymentResponse> getPaymentByRide(@PathVariable Long rideId) {
 
         return ResponseEntity.ok(paymentService.getPaymentByRide(rideId));
     }
 
     @GetMapping("/transaction/{txnId}")
-    public ResponseEntity<Payment> getPaymentByTxn(@PathVariable String txnId) {
+    public ResponseEntity<PaymentResponse> getPaymentByTxn(@PathVariable String txnId) {
 
         return ResponseEntity.ok(paymentService.getPaymentByTransaction(txnId));
     }

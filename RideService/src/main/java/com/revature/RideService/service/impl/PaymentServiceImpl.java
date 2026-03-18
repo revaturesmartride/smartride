@@ -1,10 +1,12 @@
 package com.revature.RideService.service.impl;
 
 import com.revature.RideService.dto.request.PaymentRequestDTO;
+import com.revature.RideService.dto.response.PaymentResponse;
 import com.revature.RideService.entity.Payment;
 import com.revature.RideService.entity.PaymentMethod;
 import com.revature.RideService.entity.PaymentStatus;
 import com.revature.RideService.entity.Ride;
+import com.revature.RideService.kafka.producer.PaymentEventProducer;
 import com.revature.RideService.repository.PaymentRepository;
 import com.revature.RideService.repository.RideRepository;
 import com.revature.RideService.service.PaymentService;
@@ -18,15 +20,17 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final RideRepository rideRepository;
+    private final PaymentEventProducer paymentEventProducer;
 
     public PaymentServiceImpl(PaymentRepository paymentRepository,
-                              RideRepository rideRepository) {
+                              RideRepository rideRepository, PaymentEventProducer paymentEventProducer) {
         this.paymentRepository = paymentRepository;
         this.rideRepository = rideRepository;
+        this.paymentEventProducer = paymentEventProducer;
     }
 
     @Override
-    public Payment processPayment(PaymentRequestDTO request) {
+    public PaymentResponse processPayment(PaymentRequestDTO request) {
 
         // fetch ride
         Ride ride = rideRepository.findById(request.getRideId())
@@ -50,20 +54,46 @@ public class PaymentServiceImpl implements PaymentService {
                 .ride(ride)
                 .build();
 
-        return paymentRepository.save(payment);
+        Payment savedPayment = paymentRepository.save(payment);
+
+        PaymentResponse response = mapToDTO(savedPayment);
+
+        paymentEventProducer.sendPaymentSuccessEvent(response);
+
+        return response;
     }
 
     @Override
-    public Payment getPaymentByRide(Long rideId) {
+    public PaymentResponse getPaymentByRide(Long rideId) {
 
-        return paymentRepository.findByRide_Id(rideId)
+        Payment payment = paymentRepository.findByRide_Id(rideId)
                 .orElseThrow(() -> new RuntimeException("Payment not found for ride"));
+
+        return mapToDTO(payment);
+
+
     }
 
     @Override
-    public Payment getPaymentByTransaction(String transactionId) {
+    public PaymentResponse getPaymentByTransaction(String transactionId) {
 
-        return paymentRepository.findByTransactionId(transactionId)
+        Payment payment = paymentRepository.findByTransactionId(transactionId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        return mapToDTO(payment);
+    }
+
+    private PaymentResponse mapToDTO(Payment payment) {
+        return PaymentResponse.builder()
+                .paymentId(payment.getId())
+                .rideId(payment.getRide().getId())
+                .riderId(payment.getRiderId())
+                .driverId(payment.getDriverId())
+                .amount(payment.getAmount())
+                .paymentMethod(payment.getPaymentMethod().name())
+                .paymentStatus(payment.getPaymentStatus().name())
+                .transactionId(payment.getTransactionId())
+                .createdAt(payment.getCreatedAt())
+                .build();
     }
 }
