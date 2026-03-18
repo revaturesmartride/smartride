@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         DriverProfile driverProfile = DriverProfile.builder()
                 .user(user)
                 .licenceNumber(request.getLicenceNumber())
-                .vehicleId(request.getVehicleId())
+                .vehicleId(request.getVehicleId() != null ? Long.parseLong(request.getVehicleId()) : null)
                 .rating(0.0)
                 .totalRides(0)
                 .availabilityStatus(DriverAvailabilityStatus.OFFLINE)
