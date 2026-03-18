@@ -122,7 +122,7 @@ public class RideEventProducer {
     /**
      * Generic send method used by all publish methods above.
      *
-     * Uses CompletableFuture (Spring Kafka 3.x API) instead of the deprecated
+     * Uses CompletableFuture  instead of the deprecated
      * ListenableFuture to handle success / failure asynchronously without
      * blocking the calling thread.
      *
@@ -138,8 +138,7 @@ public class RideEventProducer {
     private void send(String topic, String key, Object event, String eventType) {
         log.info("Publishing [{}] → topic='{}' key='{}'", eventType, topic, key);
 
-        CompletableFuture<SendResult<String, Object>> future = //main asynchrounous works here the CompatableFu
-                kafkaTemplate.send(topic, key, event);
+        CompletableFuture<SendResult<String, Object>> future =kafkaTemplate.send(topic, key, event); //main asynchrounous works here the CompatableFuture says A result that will be available in the future
 
         future.whenComplete((result, ex) -> {
             if (ex != null) {
