@@ -138,7 +138,7 @@ public class RideEventProducer {
     private void send(String topic, String key, Object event, String eventType) {
         log.info("Publishing [{}] → topic='{}' key='{}'", eventType, topic, key);
 
-        CompletableFuture<SendResult<String, Object>> future =
+        CompletableFuture<SendResult<String, Object>> future = //main asynchrounous works here the CompatableFu
                 kafkaTemplate.send(topic, key, event);
 
         future.whenComplete((result, ex) -> {

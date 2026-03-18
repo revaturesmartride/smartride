@@ -153,7 +153,7 @@ public class GlobalExceptionHandler {
      *   "status"      : 404,
      *   "error"       : "Not Found",
      *   "message"     : "Ride not found with id: 42",
-     *   "fieldErrors" : null,
+     *
      *   "timestamp"   : "2024-01-15T10:30:00"
      * }
      */
