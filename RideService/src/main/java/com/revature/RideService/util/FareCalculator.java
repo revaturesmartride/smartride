@@ -5,6 +5,8 @@ import com.revature.RideService.client.NominatimClient;
 import com.revature.RideService.client.OsrmClient;
 import com.revature.RideService.dto.response.NominatimResponse;
 import com.revature.RideService.dto.response.OsrmResponse;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -36,7 +38,8 @@ public class FareCalculator {
         validate(pickup, drop);
         return getRoadDistanceKm(pickup, drop);
     }
-
+    @CircuitBreaker(name = "osrm", fallbackMethod = "distanceFallback")
+    @Retry(name = "osrm")
     private double getRoadDistanceKm(String pickup, String drop) {
         double[] from = geocode(pickup);
         double[] to   = geocode(drop);
@@ -53,7 +56,8 @@ public class FareCalculator {
         log.info("Road distance: {}m = {}km", metres, km);
         return km;
     }
-
+    @CircuitBreaker(name = "nominatim", fallbackMethod = "geocodeFallback")
+    @Retry(name = "nominatim")
     private double[] geocode(String address) {
         log.info("Geocoding: '{}'", address);
         List<NominatimResponse> results = nominatimClient.search(address, "json", 1);
@@ -79,5 +83,12 @@ public class FareCalculator {
 
     private double round(double value) {
         return Math.round(value * 100.0) / 100.0;
+    }
+    private double[] geocodeFallback(String address, Throwable t) {
+        throw new IllegalStateException("Geocoding unavailable. Try again later.");
+    }
+
+    private double distanceFallback(String pickup, String drop, Throwable t) {
+        throw new IllegalStateException("Distance service unavailable. Try again later.");
     }
 }

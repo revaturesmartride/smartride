@@ -3,6 +3,7 @@ package com.revature.RideService.client;
 import com.revature.RideService.dto.response.NominatimResponse;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -20,6 +21,7 @@ import java.util.List;
  *       &limit=1
  */
 @FeignClient(name = "nominatim-client", url = "${nominatim.base-url}")
+
 public interface NominatimClient {
 
     @GetMapping("/search")
