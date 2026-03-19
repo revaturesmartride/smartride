@@ -1,18 +1,17 @@
 package com.smartride.userservice.model;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table
 @Builder
+@Table(name = "users_db")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,5 +28,4 @@ public class UserEntity {
     private UserStatus status;
     @CreationTimestamp
     private Timestamp createdAt;
-
 }

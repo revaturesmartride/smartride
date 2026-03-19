@@ -1,8 +1,7 @@
 package com.smartride.userservice.model;
 
 public enum UserRole {
-    RIDER,
+    ADMIN,
     DRIVER,
-    ADMIN
-
+    RIDER
 }
