@@ -137,9 +137,18 @@ class AuthServiceImplTest {
 
         log.info("Testing registerDriver_success");
 
+        UserEntity driverUser = UserEntity.builder()
+                .userId(1L)
+                .userName(driverRequest.getUserName())
+                .userEmail(driverRequest.getUserEmail())
+                .userPassword("encodedPassword")
+                .userRole(UserRole.DRIVER)
+                .status(UserStatus.ACTIVE)
+                .build();
+
         when(userRepository.existsByUserEmail(driverRequest.getUserEmail())).thenReturn(false);
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
-        when(userRepository.save(any(UserEntity.class))).thenReturn(user);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(driverUser);
         when(jwtTokenProvider.generateToken(anyString(), anyString())).thenReturn("jwtToken");
 
         AuthResponse response = authService.registerDriver(driverRequest);
@@ -149,12 +158,12 @@ class AuthServiceImplTest {
         assertNotNull(response);
         assertEquals("jwtToken", response.getToken());
         assertEquals(UserRole.DRIVER, response.getRole());
+        assertEquals(1L, response.getUserId());
 
         verify(userRepository).save(any(UserEntity.class));
         verify(driverProfileRepository).save(any(DriverProfile.class));
         verify(jwtTokenProvider).generateToken(anyString(), anyString());
     }
-
     @Test
     @DisplayName("Throw exception when driver email already exists")
     void registerDriver_emailAlreadyExists() {

@@ -6,6 +6,9 @@ import com.smartride.userservice.dto.request.UserUpdateRequest;
 import com.smartride.userservice.dto.response.UserResponse;
 import com.smartride.userservice.model.UserRole;
 import com.smartride.userservice.model.UserStatus;
+import com.smartride.userservice.security.CustomUserDetailsService;
+import com.smartride.userservice.security.JwtAuthenticationFilter;
+import com.smartride.userservice.security.JwtTokenProvider;
 import com.smartride.userservice.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -30,12 +34,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 @WebMvcTest(UserController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private UserService userService;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;

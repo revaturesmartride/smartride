@@ -8,6 +8,9 @@ import com.smartride.userservice.model.UserEntity;
 import com.smartride.userservice.model.UserStatus;
 import com.smartride.userservice.repository.DriverProfileRepository;
 import com.smartride.userservice.repository.UserRepository;
+import com.smartride.userservice.security.CustomUserDetailsService;
+import com.smartride.userservice.security.JwtAuthenticationFilter;
+import com.smartride.userservice.security.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
@@ -25,15 +30,26 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@AutoConfigureMockMvc(addFilters = false)
 class AdminControllerTest {
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private DriverProfileRepository driverProfileRepository;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
+
 
     @InjectMocks
     private AdminController adminController;
+
 
     private UserEntity user;
     private DriverProfile driver;

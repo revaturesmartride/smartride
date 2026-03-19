@@ -1,6 +1,5 @@
 package com.smartride.userservice.service.impl;
 
-import static org.junit.jupiter.api.Assertions.*;
 import com.smartride.userservice.dto.request.UserUpdateRequest;
 import com.smartride.userservice.dto.response.UserResponse;
 import com.smartride.userservice.exception.ResourceNotFoundException;
@@ -9,19 +8,15 @@ import com.smartride.userservice.model.UserEntity;
 import com.smartride.userservice.model.UserRole;
 import com.smartride.userservice.model.UserStatus;
 import com.smartride.userservice.repository.UserRepository;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -29,6 +24,8 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @Slf4j
