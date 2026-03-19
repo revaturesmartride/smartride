@@ -7,15 +7,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
@@ -30,8 +32,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email = null;
 
         try {
+
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 token = authHeader.substring(7);
+
                 email = jwtTokenProvider.getEmailFromToken(token);
             }
 
@@ -39,14 +43,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (jwtTokenProvider.validateToken(token)) {
 
+                    String role = jwtTokenProvider.getRoleFromToken(token);
+
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
                                     email,
                                     null,
-                                    Collections.emptyList()
+                                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
                             );
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.getWriter().write("Invalid JWT Token");
