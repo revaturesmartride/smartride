@@ -57,23 +57,26 @@ class AuthServiceImplTest {
 
         log.info("Setting up test data");
 
-        riderRequest = new RiderRegisterRequest();
-        riderRequest.setUserName("John");
-        riderRequest.setUserEmail("john@test.com");
-        riderRequest.setUserPassword("password");
-        riderRequest.setUserPhone("9999999999");
+        riderRequest = RiderRegisterRequest.builder()
+                .userName("John")
+                .userEmail("john@test.com")
+                .userPassword("password")
+                .userPhone("9999999999")
+                .build();
 
-        driverRequest = new DriverRegisterRequest();
-        driverRequest.setUserName("Driver");
-        driverRequest.setUserEmail("driver@test.com");
-        driverRequest.setUserPassword("password");
-        driverRequest.setUserPhone("8888888888");
-        driverRequest.setLicenceNumber("LIC123");
-        driverRequest.setVehicleId("VEH123");
+        driverRequest = DriverRegisterRequest.builder()
+                .userName("Driver")
+                .userEmail("driver@test.com")
+                .userPassword("password")
+                .userPhone("8888888888")
+                .licenceNumber("LIC123")
+                .vehicleId("VEH123")
+                .build();
 
-        loginRequest = new LoginRequest();
-        loginRequest.setUserEmail("john@test.com");
-        loginRequest.setUserPassword("password");
+        loginRequest = LoginRequest.builder()
+                .userEmail("john@test.com")
+                .userPassword("password")
+                .build();
 
         user = UserEntity.builder()
                 .userId(1L)
@@ -83,6 +86,7 @@ class AuthServiceImplTest {
                 .userRole(UserRole.RIDER)
                 .status(UserStatus.ACTIVE)
                 .build();
+
     }
 
     // ------------------ Rider Tests ------------------

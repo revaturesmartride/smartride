@@ -12,6 +12,7 @@ import com.smartride.userservice.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,6 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setUp() {
-
         log.info("Setting up UserService test data");
 
         user = UserEntity.builder()
@@ -57,12 +57,16 @@ class UserServiceImplTest {
                 .build();
     }
 
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext(); // Prevent auth leakage between tests
+    }
+
     // ------------------ getUserById ------------------
 
     @Test
     @DisplayName("Get user by ID successfully")
     void getUserById_success() {
-
         log.info("Testing getUserById_success");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -81,7 +85,6 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Throw exception when user not found by ID")
     void getUserById_notFound() {
-
         log.warn("Testing getUserById_notFound");
 
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
@@ -95,7 +98,6 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Get all users successfully")
     void getAllUsers_success() {
-
         log.info("Testing getAllUsers_success");
 
         List<UserEntity> users = Arrays.asList(user);
@@ -117,7 +119,6 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Delete user successfully")
     void deleteUser_success() {
-
         log.info("Testing deleteUser_success");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -130,7 +131,6 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Throw exception when deleting non-existing user")
     void deleteUser_notFound() {
-
         log.warn("Testing deleteUser_notFound");
 
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
@@ -144,25 +144,19 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Update user successfully")
     void updateUser_success() {
-
         log.info("Testing updateUser_success");
 
-        UserUpdateRequest request = new UserUpdateRequest();
-        request.setUserName("UpdatedName");
+        UserUpdateRequest request = UserUpdateRequest.builder()
+                .userName("UpdatedName")
+                .build();
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken("john@test.com", null);
-
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        when(userRepository.findByUserEmail("john@test.com"))
-                .thenReturn(Optional.of(user));
-
-        when(userRepository.findById(1L))
-                .thenReturn(Optional.of(user));
-
-        when(userRepository.save(any(UserEntity.class)))
-                .thenReturn(user);
+        when(userRepository.findByUserEmail("john@test.com")).thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(user);
 
         UserResponse response = userService.updateUser(1L, request);
 
@@ -176,11 +170,11 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Throw exception when user tries to update another user (Unauthorized)")
     void updateUser_unauthorized() {
-
         log.error("Testing updateUser_unauthorized");
 
-        UserUpdateRequest request = new UserUpdateRequest();
-        request.setUserName("Hack");
+        UserUpdateRequest request = UserUpdateRequest.builder()
+                .userName("Hack")
+                .build();
 
         UserEntity anotherUser = UserEntity.builder()
                 .userId(2L)
@@ -189,11 +183,9 @@ class UserServiceImplTest {
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken("other@test.com", null);
-
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        when(userRepository.findByUserEmail("other@test.com"))
-                .thenReturn(Optional.of(anotherUser));
+        when(userRepository.findByUserEmail("other@test.com")).thenReturn(Optional.of(anotherUser));
 
         assertThrows(UnauthorizedException.class,
                 () -> userService.updateUser(1L, request));
@@ -202,27 +194,48 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Throw exception when updating non-existing user")
     void updateUser_userNotFound() {
-
         log.warn("Testing updateUser_userNotFound");
 
-        UserUpdateRequest request = new UserUpdateRequest();
-        request.setUserName("Update");
+        UserUpdateRequest request = UserUpdateRequest.builder()
+                .userName("Update")
+                .build();
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken("john@test.com", null);
-
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        when(userRepository.findByUserEmail("john@test.com"))
-                .thenReturn(Optional.of(user));
-
-        when(userRepository.findById(1L))
-                .thenReturn(Optional.empty());
+        when(userRepository.findByUserEmail("john@test.com")).thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,
                 () -> userService.updateUser(1L, request));
     }
 
+    @Test
+    @DisplayName("Update all user fields successfully")
+    void updateUser_fullUpdate() {
+        log.info("Testing updateUser_fullUpdate");
 
+        UserUpdateRequest request = UserUpdateRequest.builder()
+                .userName("NewName")
+                .userEmail("new@test.com")
+                .userPhone("8888888888")
+                .build();
 
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken("john@test.com", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        when(userRepository.findByUserEmail("john@test.com")).thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(user);
+
+        UserResponse response = userService.updateUser(1L, request);
+
+        log.info("Updated response (full): {}", response);
+
+        assertNotNull(response);
+
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
 }

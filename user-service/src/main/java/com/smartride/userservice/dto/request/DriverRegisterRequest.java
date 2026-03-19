@@ -7,8 +7,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Builder
 public class DriverRegisterRequest {
     @NotBlank
     private String userName;
