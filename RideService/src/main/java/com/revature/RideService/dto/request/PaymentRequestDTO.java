@@ -3,6 +3,8 @@ package com.revature.RideService.dto.request;
 import lombok.*;
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentRequestDTO {
 
     private Long riderId;
