@@ -18,9 +18,7 @@ public class JwtTokenProvider {
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
-
     public String generateToken(String userEmail, String role) {
-        Object SignatureAlgorithm;
         return Jwts.builder()
                 .setSubject(userEmail)
                 .claim("role", role)

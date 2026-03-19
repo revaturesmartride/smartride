@@ -15,11 +15,13 @@ import com.smartride.userservice.service.AuthService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
@@ -32,6 +34,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse registerRider(RiderRegisterRequest request) {
+        log.info("Registering rider with email: {}", request.getUserEmail());
+
         checkEmailExists(request.getUserEmail());
 
         UserEntity user = createUser(
@@ -42,6 +46,8 @@ public class AuthServiceImpl implements AuthService {
                 UserRole.RIDER
         );
 
+        log.info("Rider registered successfully with ID: {}", user.getUserId());
+
         return buildAuthResponse(user);
     }
     /*
@@ -51,9 +57,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse registerDriver(DriverRegisterRequest request) {
-        checkEmailExists(request.getUserEmail());
 
+        log.info("Registering driver with email: {}", request.getUserEmail());
+
+        checkEmailExists(request.getUserEmail());
         // Create UserEntity using builder
+
         UserEntity user = createUser(
                 request.getUserName(),
                 request.getUserEmail(),
@@ -61,8 +70,8 @@ public class AuthServiceImpl implements AuthService {
                 request.getUserPhone(),
                 UserRole.DRIVER
         );
-
         // We are using  DriverProfile using builder
+
         DriverProfile driverProfile = DriverProfile.builder()
                 .user(user)
                 .licenceNumber(request.getLicenceNumber())
@@ -75,6 +84,8 @@ public class AuthServiceImpl implements AuthService {
 
         driverProfileRepository.save(driverProfile);
 
+        log.info("Driver registered successfully with ID: {}", user.getUserId());
+
         return buildAuthResponse(user);
     }
     /*
@@ -83,26 +94,37 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
+        log.info("Login attempt for email: {}", request.getUserEmail());
+
         UserEntity user = userRepository.findByUserEmail(request.getUserEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found with email: {}", request.getUserEmail());
+                    return new ResourceNotFoundException("User not found");
+                });
 
         if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())) {
+            log.error("Invalid password for email: {}", request.getUserEmail());
             throw new UnauthorizedException("Invalid credentials");
         }
 
+        log.info("Login successful for user ID: {}", user.getUserId());
+
         return buildAuthResponse(user);
-    }
-    private void checkEmailExists(String email) {
-        if (userRepository.existsByUserEmail(email)) {
-            throw new ResourceAlreadyExistsException("Email already registered");
-        }
     }
     /*
     -----these are the helper methods that are helpful for above methods
      */
+    private void checkEmailExists(String email) {
+        if (userRepository.existsByUserEmail(email)) {
+            log.error("Email already exists: {}", email);
+            throw new ResourceAlreadyExistsException("Email already registered");
+        }
+    }
     private UserEntity createUser(
             String userName, String userEmail, String userPassword, String userPhone, UserRole userRole
     ) {
+        log.debug("Creating user with email: {}", userEmail);
+
         UserEntity user = UserEntity.builder()
                 .userName(userName)
                 .userEmail(userEmail)
@@ -116,6 +138,8 @@ public class AuthServiceImpl implements AuthService {
     }
     private AuthResponse buildAuthResponse(UserEntity user) {
 
+        log.debug("Generating token for user ID: {}", user.getUserId());
+
         String token = jwtTokenProvider.generateToken(
                 user.getUserEmail(),
                 user.getUserRole().name()
@@ -125,6 +149,5 @@ public class AuthServiceImpl implements AuthService {
                 .token(token)
                 .role(user.getUserRole())
                 .userId(user.getUserId())
-                .build();
-    }
+                .build();  }
 }

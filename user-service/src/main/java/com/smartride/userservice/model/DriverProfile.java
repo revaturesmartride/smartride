@@ -24,21 +24,14 @@ public class DriverProfile {
     @OneToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
-
     private String licenceNumber;
-
     private  String vehicleId;
-
     private Double rating;
-
     private int totalRides;
-
     @Enumerated(EnumType.STRING)
     private DriverAvailabilityStatus availabilityStatus;
-
     @Enumerated(EnumType.STRING)
     private DriverApprovalStatus approvalStatus;
-
     @CreationTimestamp
     private Timestamp createdAt;
 
