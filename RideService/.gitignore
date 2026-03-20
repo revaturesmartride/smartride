@@ -32,3 +32,13 @@ build/
 ### VS Code ###
 .vscode/
 .idea/
+
+# Maven
+.m2/
+
+
+# Logs
+logs/
+*.log
+
+
