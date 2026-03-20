@@ -5,6 +5,7 @@ import com.smartride.userservice.dto.request.LoginRequest;
 import com.smartride.userservice.dto.request.RiderRegisterRequest;
 import com.smartride.userservice.dto.response.AuthResponse;
 import com.smartride.userservice.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         log.info("Login request received for email: {}", request.getUserEmail());
 
         AuthResponse response = authService.login(request);
@@ -29,7 +30,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
     @PostMapping("/register/rider")
-    public ResponseEntity<AuthResponse> registerRider(@RequestBody RiderRegisterRequest request) {
+    public ResponseEntity<AuthResponse> registerRider(@Valid @RequestBody RiderRegisterRequest request) {
         log.info("Rider registration request received for email: {}", request.getUserEmail());
 
         AuthResponse response = authService.registerRider(request);
@@ -39,7 +40,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
     @PostMapping("/register/driver")
-    public ResponseEntity<AuthResponse> registerDriver(@RequestBody DriverRegisterRequest request) {
+    public ResponseEntity<AuthResponse> registerDriver(@Valid @RequestBody DriverRegisterRequest request) {
         log.info("Driver registration request received for email: {}", request.getUserEmail());
 
         AuthResponse response = authService.registerDriver(request);
