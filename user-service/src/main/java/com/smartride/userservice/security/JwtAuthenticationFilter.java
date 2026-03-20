@@ -22,11 +22,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    // ── These paths skip JWT validation entirely ──────────────────────────────
     private static final List<String> PUBLIC_PATHS = List.of(
             "/api/auth/",
-            "/api/users/email/",
-            "/api/users/"
+            "/api/users/email/",   // only the internal gateway lookup
+            "/api/users/internal/"  // internal service-to-service calls
     );
 
     @Override

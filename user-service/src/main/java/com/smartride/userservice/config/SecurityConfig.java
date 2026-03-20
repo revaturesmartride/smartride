@@ -39,13 +39,16 @@ public class SecurityConfig {
                         // ── Internal service-to-service calls ─────────────────
                         // Gateway calls this to resolve email → userId
                         .requestMatchers("/api/users/email/**").permitAll()
+                        .requestMatchers("/api/users/internal/**").permitAll()
+                        // ── Internal service-to-service calls ─────────────────
+                        .requestMatchers("/internal/**").permitAll()
                         // RideService Feign calls this to validate user exists
                         .requestMatchers("/api/users/**").permitAll()
 
                         // ── Admin endpoints ───────────────────────────────────
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);

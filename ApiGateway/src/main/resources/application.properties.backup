@@ -23,33 +23,33 @@ spring.cloud.gateway.routes[0].predicates[0]=Path=/api/users/email/**
 
 # 2. Auth routes ? PUBLIC (no JWT required)
 spring.cloud.gateway.routes[1].id=user-service-public
-spring.cloud.gateway.routes[1].uri=lb://USER-SERVICE
-spring.cloud.gateway.routes[1].predicates[0]=Path=/api/auth/**
+spring.cloud.gateway.routes[0].uri=lb://USER-SERVICE
+spring.cloud.gateway.routes[0].predicates[0]=Path=/api/auth/**
 
-# 3. UserService ? protected (EXCEPT email endpoint)
-spring.cloud.gateway.routes[2].id=user-service
-spring.cloud.gateway.routes[2].uri=lb://USER-SERVICE
-spring.cloud.gateway.routes[2].predicates[0]=Path=/api/users/(?!(email/)).**
+# 2. UserService ? protected
+spring.cloud.gateway.routes[1].id=user-service
+spring.cloud.gateway.routes[1].uri=lb://USER-SERVICE
+spring.cloud.gateway.routes[1].predicates[0]=Path=/api/users/**
+spring.cloud.gateway.routes[1].filters[0]=JwtAuthFilter
+
+# 3. RideService
+spring.cloud.gateway.routes[2].id=ride-service
+spring.cloud.gateway.routes[2].uri=lb://RIDESERVICE
+spring.cloud.gateway.routes[2].predicates[0]=Path=/api/rides/**
 spring.cloud.gateway.routes[2].filters[0]=JwtAuthFilter
 
-# 4. RideService
-spring.cloud.gateway.routes[3].id=ride-service
+# 4. PaymentService (inside RideService module)
+spring.cloud.gateway.routes[3].id=payment-service
 spring.cloud.gateway.routes[3].uri=lb://RIDESERVICE
-spring.cloud.gateway.routes[3].predicates[0]=Path=/api/rides/**
+spring.cloud.gateway.routes[3].predicates[0]=Path=/api/payments/**
 spring.cloud.gateway.routes[3].filters[0]=JwtAuthFilter
 
-# 5. PaymentService (inside RideService module)
-spring.cloud.gateway.routes[4].id=payment-service
+# 5. RatingService (inside RideService module)
+spring.cloud.gateway.routes[4].id=rating-service
 spring.cloud.gateway.routes[4].uri=lb://RIDESERVICE
-spring.cloud.gateway.routes[4].predicates[0]=Path=/api/payments/**
+spring.cloud.gateway.routes[4].predicates[0]=Path=/api/ratings/**
 spring.cloud.gateway.routes[4].filters[0]=JwtAuthFilter
 
-# 6. RatingService (inside RideService module)
-spring.cloud.gateway.routes[5].id=rating-service
-spring.cloud.gateway.routes[5].uri=lb://RIDESERVICE
-spring.cloud.gateway.routes[5].predicates[0]=Path=/api/ratings/**
-spring.cloud.gateway.routes[5].filters[0]=JwtAuthFilter
-
-# ?? Logging ????????????????????????????????????????????????????????????????????
+# ?? Logging ???????????????????????????????????????????????????????????????????
 logging.level.org.springframework.cloud.gateway=DEBUG
 logging.level.com.revature.apigateway=DEBUG

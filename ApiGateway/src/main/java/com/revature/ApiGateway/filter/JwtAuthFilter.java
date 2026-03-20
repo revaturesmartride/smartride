@@ -1,6 +1,5 @@
 package com.revature.ApiGateway.filter;
 
-
 import com.revature.ApiGateway.client.UserServiceClient;
 import com.revature.ApiGateway.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +29,17 @@ import reactor.core.publisher.Mono;
  * Downstream services read:
  *   @RequestHeader("X-User-Id")    Long userId
  *   @RequestHeader("X-User-Role")  String role
+ *
+ * Root cause of original bug:
+ *   switchIfEmpty() was chained AFTER flatMap(chain.filter()).
+ *   chain.filter() returns Mono<Void> which is ALWAYS empty by definition.
+ *   So switchIfEmpty always fired → always returned 401 even on success.
+ *
+ * Fix:
+ *   switchIfEmpty() is now chained BEFORE flatMap, scoping it only to
+ *   the userServiceClient lookup. If the user is not found, it returns 401.
+ *   If found, flatMap runs, headers are mutated, request is forwarded.
+ *   chain.filter()'s Mono<Void> is no longer watched by switchIfEmpty.
  */
 @Component
 @Slf4j
@@ -76,7 +86,17 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
             log.info("JWT valid | email={} role={}", email, role);
 
             // ── Step 4 + 5: Resolve userId → mutate headers → forward ─────────
+            //
+            // IMPORTANT: switchIfEmpty must be placed BEFORE flatMap.
+            // chain.filter() returns Mono<Void> which is always empty —
+            // placing switchIfEmpty after flatMap caused it to trigger on
+            // every successful request, returning 401 unconditionally.
+            //
             return userServiceClient.getUserIdByEmail(email)
+                    .switchIfEmpty(Mono.defer(() -> {
+                        log.error("Could not resolve userId for email: {}", email);
+                        return unauthorized(exchange).then(Mono.empty());
+                    }))
                     .flatMap(userId -> {
                         log.info("Resolved userId={} for email={}", userId, email);
 
@@ -90,10 +110,11 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
 
                         return chain.filter(mutatedExchange);
                     })
-                    .switchIfEmpty(Mono.defer(() -> {
-                        log.error("Could not resolve userId for email: {}", email);
+                    .onErrorResume(e -> {
+                        log.error("JwtAuthFilter unexpected error for path={} : {}",
+                                path, e.getMessage());
                         return unauthorized(exchange);
-                    }));
+                    });
         };
     }
 
