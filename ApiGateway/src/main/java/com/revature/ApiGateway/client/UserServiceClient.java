@@ -3,38 +3,32 @@ package com.revature.ApiGateway.client;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-/**
- * Reactive WebClient that calls UserService to resolve email → userId.
- *
- * Why needed:
- *   JWT subject is userEmail (not userId).
- *   Downstream services (RideService etc.) need userId via X-User-Id header.
- *   Gateway calls this once per request to resolve the id.
- *
- * Requires UserService to expose:
- *   GET /api/users/email/{email}  → { "userId": 42 }
- */
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class UserServiceClient {
 
-    private final WebClient.Builder webClientBuilder;
+    private final WebClient webClient;
 
-    @Value("${userservice.url}")
-    private String userServiceUrl;
+    /**
+     * Build the WebClient ONCE using the @LoadBalanced builder.
+     * baseUrl is set here at construction time — not inside the method.
+     * This ensures the load-balanced builder is actually used.
+     */
+    public UserServiceClient(WebClient.Builder webClientBuilder,
+                             @Value("${userservice.url}") String userServiceUrl) {
+        this.webClient = webClientBuilder
+                .baseUrl(userServiceUrl)
+                .build();
+    }
 
     public Mono<Long> getUserIdByEmail(String email) {
-        return webClientBuilder
-                .baseUrl(userServiceUrl)
-                .build()
+        return webClient
                 .get()
                 .uri("/api/users/email/{email}", email)
                 .retrieve()
